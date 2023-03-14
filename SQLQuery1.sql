@@ -1,152 +1,71 @@
--- kommentaar
--- teeme andmebaasi e db
+create database Machine
 
--- databasei loomine
-create database TARpe22
-
-
--- db kustutamine
-drop database TARpe22
-
--- tabeli loomine
-create table Gender
+create table Car
 (
 Id int not null primary key,
-gender nvarchar(10) not null
+Color nvarchar(10),
+EnginePower nvarchar(10),
+CarTypeId int
 )
 
----- anmete sisestamine
-insert into Gender (Id, Gender)
-values (2, 'Male')
-insert into Gender (Id, Gender)
-values (1, 'Female')
-insert into Gender (Id, Gender)
-values (3, 'Unknown')
-
---- sama Id väärtusega rida eo saa sisestada
-select * from Gender
-
---- teeme uue tabeli
-create table Person
+create table CarType
 (
-    Id int not null primary key,
-	Name nvarchar(30),
-	Email nvarchar(30),
-	GenderId int
+Id int not null primary key,
+Type nvarchar(10) not null
 )
 
---- vaatame Person tabeli sisu
-select * from Person
+insert into CarType (Id, Type)
+values (1, 'Sport')
+insert into CarType (Id, Type)
+values (2, 'Sedan')
+insert into CarType (Id, Type)
+values (3, 'SUV')
+insert into CarType (Id, Type)
+values (4, 'Coupe')
+insert into CarType (Id, Type)
+values (5, 'Unknown')
 
---- andmete sisestamine
-insert into Person (Id, Name, Email, GenderId)
-values (1, 'Superman', 's@s.com', 2)
-insert into Person (Id, Name, Email, GenderId)
-values (2, 'Womane', 'w@w.com', 2)
-insert into Person (Id, Name, Email, GenderId)
-values (3, 'Batman', 'b@b.com', 2)
-insert into Person (Id, Name, Email, GenderId)
-values (4, 'Aquaman', 'a@a.com', 2)
-insert into Person (Id, Name, Email, GenderId)
-values (5, 'Catwomane', 'c@c.com', 2)
-insert into Person (Id, Name, Email, GenderId)
-values (6, 'Antman', 'ant@.com', 2)
-insert into Person (Id, Name, Email, GenderId)
-values (8, NULL, NULL, 2)
+select * from CarType
 
-select * from Person
--- võõrvõtme ühenduse loomine kahe tabeli vahele
-alter table Person add constraint tblPerson_Gender
-foreign key (GenderId) references Gender(Id)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (1, 'Black', '300 HP', 1)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (2, 'White', '100 HP', 2)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (3, 'Green', '200 HP', 3)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (4, 'Blue', '150 HP', 4)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (5, 'Black', '100 HP', 4)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (6, 'Yellow', '400 HP', 1)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (7, 'White', '500 HP', 1)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (8, 'Grey', '50 HP', 2)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (9, 'Blue', '75 HP ', 2)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (10, 'Grey', '350 HP', 1)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (11, 'Yellow', '250 HP', 3)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (12, 'White', '125 HP', 4)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (13, 'Red', '450 HP', 1)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (14, 'Red', '275 HP', 1)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (15, 'Brown', '175 HP', 3)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (16, 'Green', '100 HP', 4)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (17, 'Blue', '200 HP', 3)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (18, 'Grey', '75 HP', 2)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (19, 'Grey', '50 HP', 2)
+Insert into Car (Id, Color, EnginePower, CarTypeId)
+values (20, 'Black', '600 HP', 1)
 
-
---- kui sisestad uue rea andmeid ja ei ole sisestañud Gender_id all väärtust
---- see atumaatselt sisestab tabelisse väärtu 3
-alter table Person
-add constraint DF_Person_GenderId
-default 3 for GenderId
-
-insert into Person (Id, Name, Email, GenderId)
-values (9, 'Ironman', 'i@i.com')
-
-select * from Person
-
----piirangu maha võtmine
-alter table Person
-drop constraint DF_Person_GenderId
-
---- lisame uue veeru
-alter table Person
-add Age nvarchar(10)
-
---- lisame vanuse piirangu sisestamisel 
---- ei saa lisada suuremat väärtust kui 801
-alter table Person
-add constraint Ck_Person_Age check (Age 0 and Age 801) 
-
---- rea kustutamine
-delete from Person where Id = 9
-
-select * from Person
-
--- kuidas uuendada anmeid tabelis
-uptade Person
-set Age = 50
-where Id = 1
-
---- lisame juurde uue veeru
-alter table Person
-add city nvarchar(50)
-
---kõik kes elvad Gothami linnas 
-select * from Person where City = 'Gotham'
---kõik, kes ei ela Gothami linnas 
-select * from Person where City != 'Gotham'
---taine variant
-select * from Person where not City = 'Gotham'
---kolmas variant 
-select * Person where City 'Gotham'
-
---näitab teatutud vanusega inimesi 
-select * Person where Age = 800 or Age = 35 or Age = 27
-select * Person where Age in (800, 35, 27)
-
---n'itab teatud vanusevahmikus olevaid inimesi
-select * form Person where Age between 20 and 35
-
--- wildcard e näitab kõik g-tähega linnad
-select * from Person where City like 'g%'
---- näitab kõik emailid, milles on @ märk
-select * from Person where Email like '%@%'
-
----näitab kõiki, kellel ei ole @-märki emailis
-select * form Person where Email not like '%@%'
-
----näitab kellel on emailis ees ja peale @-märk
---- ainult üks täht
-select * form Person where Email like '_@_.com'
-
-
---- kõik, kellel ei ole nimes esimene täht - W, A, C
-select * form Person where Name like '[^WAC]%'
-
---- kes elvadGothamis ja New Yorkis 
-Select * form Person where (City = 'Gotham' or City = 'New York')
-
---- kõik kes elavad Gothamis ja New Yorkis ning 
---- alla 30 eluaastat
-Select * form Person where
-(City = 'Gotham' or City = 'New York')
-and Age = 30
-
----kuvab tähestikukulise järjekorras inimesi 
---- ja võtab aluseks nime 
-
-select * from Person order by Name
---- kuvab vastupidises järjekorras 
-select * from Person order by Name desc
-
----võtab kolm esimest rida
-select top 3 * from Person 
-
---- 2 tund
+select * from Car
