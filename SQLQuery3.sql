@@ -726,31 +726,109 @@ update Employees set Email = 'Russel@bbb.com' where Id = 10
 
 select * from Employees
 
+
 --- lisame *-märgi teatud kohast
-select FrirstName, LastName
-    SUBSTRING(Email,1, 2) + REPLICATE('*', 5) + 
-    SUBSTRING(Email, CHARINDEX('@', Email), +1 AS Eamil
+select FirstName, LastName,
+	SUBSTRING(Email,1, 2) + REPLICATE('*', 5) + --- peale teist tähemärki paneb viis tärni
+	SUBSTRING(Email, CHARINDEX('@', Email), len(Email) - charindex('@', Email)+1) as Email --- kuni @-m'rgini e on d[naamiline
 from Employees
 
-
---- lolm korda näitab stringis olevat väärtust 
+--- kolm korda n'itab stringis olevat v''rtust
 select REPLICATE('asd', 3)
 
---- kuidas sisestada tühikut kahe sõna vahele 
+---- kuidas sisestada tyhikut kahe nime vahele
 select SPACE(5)
 
 --- tühikute arv kahe nime vahel
-select FirstName + SPACE(25)  + LastName as FullName
+select FirstName + SPACE(25) + LastName as FullName
 from Employees
 
---- asendab kõik .comid .netiga
-select Email , REPLACE(Email, '.com', '.net') as convertedEmail
-From Employees
+---PATINDEX
+--- sama, mis CHARINDEX, aga dünaamilisem ja saab kasutada wildcardi
+select Email, PATINDEX('%@aaa.com', Email) as FirstOccurence
+from Employees
+where PATINDEX('%@aaa.com', Email) > 0 -- leiab kõik selle domeeni esindajad
+-- ja alates mitmendast märgist algab @
 
---- konkreetse masina kellaaeg
+--- k]ik .com-d asendatakse .net-ga
+select Email, REPLACE(Email, '.com', '.net') as ConvertedEmail
+from Employees
+
+--- soovin asendada peale esimest märki kolm tähte viie tärniga
+select FirstName, LastName, Email,
+	STUFF(Email, 2, 3, '*****') as StuffedEmail
+from Employees
+
+--- teeme tabeli
+create table DateTime
+(
+c_time time,
+c_date date,
+c_smalldatetime smalldatetime,
+c_datetime datetime,
+c_datetime2 datetime2,
+c_datetimeoffset datetimeoffset
+)
+
+select * from DateTime
+
+---konkreetse masina kellaaeg
 select GETDATE(), 'GETDATE()'
 
-Insert into DateTime
-Values (GETDATE(), GETDATE(),GETDATE(), GETDATE(), GETDATE(), GETDATE())  
+insert into DateTime
+values (GETDATE(), GETDATE(), GETDATE(), GETDATE(), GETDATE(), GETDATE())
 
-select * from  DateTime
+select * from DateTime
+
+update DateTime set c_datetimeoffset = '2022-04-11 11:50:34.9100000 +00:00'
+where c_datetimeoffset = '2023-04-11 11:50:34.9100000 +00:00'
+
+select CURRENT_TIMESTAMP, 'CURRENT_TIMESTAMP' --aja päring
+select SYSDATETIME(), 'SYSDATETIME' -- veel täpsem aja päring
+select SYSDATETIMEOFFSET() --- täpne aeg koos ajalise nihkega UTC suhtes
+select GETUTCDATE()  --- UTC aeg
+
+
+select ISDATE('asd') -- tagastab 0 kuna string ei ole date
+select ISDATE(GETDATE())  --- tagastab 1 kuna on kp
+select ISDATE('2023-04-11 11:50:34.9100000') -- tagastab 0 kuna max kolm komakohta võib olla
+select ISDATE('2023-04-11 11:50:34.910') -- tagastab 1
+select DAY(GETDATE()) -- annab tänase päeva nr
+select DAY('03/31/2020') -- annab stringis oleva kp ja järjestus peab olema õige
+select MONTH(GETDATE()) -- annab jooksva kuu nr
+select Month('03/31/2020') -- annab stringis oleva kuu nr
+select Year(GETDATE()) -- annab jooksva aasta nr
+select Year('03/31/2020') -- annab stringis oleva aasta nr
+
+select DATENAME(DAY, '2023-04-11 11:50:34.910') -- annab stringis oleva päeva nr
+select DATENAME(WEEKDAY, '2023-04-11 11:50:34.910') --annab stringis oleva päeva sõnana
+select DATENAME(MONTH, '2023-04-11 11:50:34.910') --annab stringis oleva kuu sõnana
+
+--- 5 tund
+
+create function fnComputeAge(@DOB datetime)
+return nvarchar (50)
+as begin
+    declare @tempdate datetime, @years int, @months int, @days int
+	    select @tempdate = @DOB
+
+		select @yeras = DATEDIFF(YEAR, @tempdate, GETDATE()) - case when (MONTH(@DOB) > MONTH(GETDATE())) OR (MONTH(@DOB)
+		= MONTH(GETDATE()) and DAY(@DOB) > DAY(GETDATE())) then 1 else 0 and
+		select @tempdate = DATEADD(YEAR, @years, @tempdate)
+
+		select @months = DATEDIFF(MONTH, @tempdate, GETDATE()) - case when DAY(@DOB) > DAY(GETDATE) then 1 else 0 end
+		select @tempdate = DATEADD(MONTH, @months, @tempdate)
+
+		select @days = DATEDIFF(DAY , @tempdate, GETDATE())
+
+	declare @Age nvarchar(50)
+	    set @Age = 
+		CAST(@years as nvarchar(4)) + ' Years '
+		+ CAST (@months as nvarchar(4)) + ' Months '
+		+ CAST (@days as nvarchar(4)) + ' Days '
+	return @Age
+end
+
+alter table Employees 
+add DateOfBirth datetime
+
